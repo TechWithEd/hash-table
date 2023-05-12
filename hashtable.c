@@ -1,17 +1,20 @@
+#include "hashtable.h"
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "hashtable.h"
 
-static size_t hash(char *key, size_t size)
+static size_t hash(const char *str)
 {
-    size_t res = 0;
-    for (int i = 0; key[i] != 0; i++)
+    size_t res = 5381;
+    const char *s = str;
+    while (*s != '\0')
     {
-        res += key[i];
-        res *= (res * key[i]);
+        res = (res << 5) + res + *s;
+        ++s;
     }
-    return res % size;
+    printf("hash(%s):\t%zu\n", str, res);
+    return res;
 }
 
 hashtable_t hashtable_new(size_t size)
@@ -30,8 +33,8 @@ hashtable_t hashtable_new(size_t size)
 
 void hashtable_insert(hashtable_t hashtable, char *key, int val)
 {
-    pair_t pair = { __OCCUPIED_NODE__, NULL, key, val };
-    int index = hash(key, hashtable->capacity);
+    pair_t pair = {__OCCUPIED_NODE__, NULL, key, val};
+    int index = hash(key) % hashtable->capacity;
     pair_t *node = &hashtable->data[index];
     while (node->next != NULL)
     {
@@ -54,7 +57,7 @@ void hashtable_insert(hashtable_t hashtable, char *key, int val)
 
 void hashtable_remove(hashtable_t hashtable, char *key)
 {
-    int index = hash(key, hashtable->capacity);
+    int index = hash(key) % hashtable->capacity;
     pair_t *node = &hashtable->data[index];
     while (node->next != NULL)
     {
@@ -68,7 +71,7 @@ void hashtable_remove(hashtable_t hashtable, char *key)
 
 const int *hashtable_get(hashtable_t hashtable, char *key)
 {
-    int index = hash(key, hashtable->capacity);
+    int index = hash(key) % hashtable->capacity;
     pair_t *node = &hashtable->data[index];
     while (node->next != NULL)
     {
@@ -82,6 +85,29 @@ const int *hashtable_get(hashtable_t hashtable, char *key)
         }
     }
     return NULL;
+}
+
+void hashtable_print(hashtable_t hashtable)
+{
+    for (int i = 0; i < hashtable->capacity; i++)
+    {
+        if (hashtable->data[i].next != NULL)
+        {
+            pair_t *node = hashtable->data[i].next;
+            pair_t *prev = NULL;
+            while (node != NULL)
+            {
+                prev = node;
+                node = node->next;
+                printf(node != NULL ? "%s: %d -> " : "%s: %d", prev->key, prev->val);
+            }
+        }
+        else
+        {
+            printf("---");
+        }
+        printf("\n");
+    }
 }
 
 void hashtable_free(hashtable_t hashtable)

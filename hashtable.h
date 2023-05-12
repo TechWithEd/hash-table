@@ -30,6 +30,7 @@ hashtable_t hashtable_new(size_t size);
 void hashtable_insert(hashtable_t hashtable, char *key, int val);
 void hashtable_remove(hashtable_t hashtable, char *key);
 const int *hashtable_get(hashtable_t hashtable, char *key);
+void hashtable_print(hashtable_t hashtable);
 void hashtable_free(hashtable_t hashtable);
 
 #ifdef __cplusplus
