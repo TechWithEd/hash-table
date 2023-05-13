@@ -13,7 +13,6 @@ static size_t hash(const char *str)
         res = (res << 5) + res + *s;
         ++s;
     }
-    printf("hash(%s):\t%zu\n", str, res);
     return res;
 }
 
