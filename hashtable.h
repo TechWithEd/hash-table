@@ -11,6 +11,8 @@ extern "C" {
 #define __OCCUPIED_NODE__   0x02
 #define __DELETED_NODE__    0x04
 
+typedef size_t (*hash_function)(char*);
+
 typedef struct pair
 {
     int status;
@@ -24,9 +26,10 @@ typedef struct hashtable
     pair_t *data;
     size_t size;
     size_t capacity;
+    hash_function hash_func;
 } *hashtable_t;
 
-hashtable_t hashtable_new(size_t size);
+hashtable_t hashtable_new(size_t size, hash_function hash);
 void hashtable_insert(hashtable_t hashtable, char *key, int val);
 void hashtable_remove(hashtable_t hashtable, char *key);
 const int *hashtable_get(hashtable_t hashtable, char *key);

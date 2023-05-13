@@ -4,19 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-static size_t hash(const char *str)
-{
-    size_t res = 5381;
-    const char *s = str;
-    while (*s != '\0')
-    {
-        res = (res << 5) + res + *s;
-        ++s;
-    }
-    return res;
-}
-
-hashtable_t hashtable_new(size_t size)
+hashtable_t hashtable_new(size_t size, hash_function hash)
 {
     hashtable_t buf = malloc(sizeof(struct hashtable));
     if (buf == NULL)
@@ -27,13 +15,14 @@ hashtable_t hashtable_new(size_t size)
     buf->data = calloc(size, sizeof(pair_t));
     buf->capacity = size;
     buf->size = 0;
+    buf->hash_func = hash;
     return buf;
 }
 
 void hashtable_insert(hashtable_t hashtable, char *key, int val)
 {
     pair_t pair = {__OCCUPIED_NODE__, NULL, key, val};
-    int index = hash(key) % hashtable->capacity;
+    int index = hashtable->hash_func(key) % hashtable->capacity;
     pair_t *node = &hashtable->data[index];
     while (node->next != NULL)
     {
@@ -56,7 +45,7 @@ void hashtable_insert(hashtable_t hashtable, char *key, int val)
 
 void hashtable_remove(hashtable_t hashtable, char *key)
 {
-    int index = hash(key) % hashtable->capacity;
+    int index = hashtable->hash_func(key) % hashtable->capacity;
     pair_t *node = &hashtable->data[index];
     while (node->next != NULL)
     {
@@ -70,7 +59,7 @@ void hashtable_remove(hashtable_t hashtable, char *key)
 
 const int *hashtable_get(hashtable_t hashtable, char *key)
 {
-    int index = hash(key) % hashtable->capacity;
+    int index = hashtable->hash_func(key) % hashtable->capacity;
     pair_t *node = &hashtable->data[index];
     while (node->next != NULL)
     {
