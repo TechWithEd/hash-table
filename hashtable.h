@@ -29,7 +29,7 @@ typedef struct hashtable
     hash_function hash_func;
 } *hashtable_t;
 
-hashtable_t hashtable_new(size_t size, hash_function hash);
+hashtable_t hashtable_new(size_t size, hash_function hash_func);
 void hashtable_insert(hashtable_t hashtable, char *key, int val);
 void hashtable_remove(hashtable_t hashtable, char *key);
 const int *hashtable_get(hashtable_t hashtable, char *key);

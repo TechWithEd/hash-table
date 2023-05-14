@@ -4,7 +4,19 @@
 #include <stdlib.h>
 #include <string.h>
 
-hashtable_t hashtable_new(size_t size, hash_function hash)
+static size_t hash(char *str)
+{
+    size_t res = 5381;
+    char *s = str;
+    while (*s != '\0')
+    {
+        res = (res << 5) + res + *s;
+        ++s;
+    }
+    return res;
+}
+
+hashtable_t hashtable_new(size_t size, hash_function hash_func)
 {
     hashtable_t buf = malloc(sizeof(struct hashtable));
     if (buf == NULL)
@@ -15,7 +27,7 @@ hashtable_t hashtable_new(size_t size, hash_function hash)
     buf->data = calloc(size, sizeof(pair_t));
     buf->capacity = size;
     buf->size = 0;
-    buf->hash_func = hash;
+    buf->hash_func = hash_func == NULL ? hash : hash_func;
     return buf;
 }
 
